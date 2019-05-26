@@ -24,6 +24,9 @@ df_theme_namecode.head()
 # Removing the missing & duplicate rows from the data
 project = df_theme_namecode[df_theme_namecode.name != ''].drop_duplicates()
 
+# Checking the first 5 rows of dataset
+project.head()
+
 # Merging firs datset : df_theme_namecode with second one: project
 # To ensure the missing value will be field with data by merging with reference to code 
 df = df_theme_namecode.merge(project, on='code')
