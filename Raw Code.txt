@@ -1,35 +1,39 @@
 # Importing Necessary Libraries
+
 import pandas as pd
 import json
 from pandas.io.json import json_normalize
 
 # Importing JSON data to a variable dataset
+
 dataset = pd.read_json('data/world_bank_projects.json')
 
 # Checking the first 5 rows of dataset
+
 dataset.head()
 
-# Checking all the coulumns
-dataset.columns
-
-# Grouping by the Countries with their respective allocated Project
-# Assign that groupby Object Count to a dataframe
-countrywise_project_count = pd.DataFrame(dataset.groupby('countryname')['project_name'].count())
-
-# Renaming the Count column to : Project Count
-countrywise_project_count.columns = ['Project Count']
-
-# Arranging the Data in Descending order & Extracting the max 10 values
-countrywise_project_count.sort_values(by = ['Project Count'], ascending=False).head(10)
+# Grouping the Data by countryname & sort the count of project, each country got in Descending order
+dataset.groupby('countryname').size().sort_values(ascending=False)[:10]
 
 # Assigning the normalized data to a variable
 df_theme_namecode = json_normalize(json.load(open('data/world_bank_projects.json')), 'mjtheme_namecode')
 
-# Removing the missing rows from the data
-df_theme_namecode = df_theme_namecode[df_theme_namecode.name != '']
+# Checking the first 5 rows of dataset
+df_theme_namecode.head()
 
-# checking for any missing rows left
-df_theme_namecode.isnull().sum()
+# Removing the missing & duplicate rows from the data
+project = df_theme_namecode[df_theme_namecode.name != ''].drop_duplicates()
+
+# Merging firs datset : df_theme_namecode with second one: project
+# To ensure the missing value will be field with data by merging with reference to code 
+df = df_theme_namecode.merge(project, on='code')
+
+# Post merge, we got 2 coulumns : name_x & name_y.
+# name_x - Original Column
+# name_y - Coulumn with imputed value
+
+df = df[['code', 'name_y']]
+df.columns = ['code', 'name']
 
 # Extracting the top 10 value of based on theme
-df_theme_namecode['name'].value_counts()[:10]
+df['name'].value_counts()[:10]
